@@ -508,6 +508,7 @@
 
   <script>
     let currentWord = '';
+    let seenWords = [];
     let savedWords = JSON.parse(localStorage.getItem('lexicon-saved') || '[]');
     let savedPanelOpen = false;
 
@@ -575,12 +576,13 @@
       saveBtn.disabled = false;
 
       try {
-        const res = await fetch('/api/word');
+        const res = await fetch('/api/word?seen=' + encodeURIComponent(seenWords.join(',')));
         const json = await res.json();
         if (!json.success) throw new Error(json.error);
 
         const d = json.data;
         currentWord = d.word;
+        if (!seenWords.includes(currentWord)) seenWords.push(currentWord);
 
         document.getElementById('word').textContent = d.word;
         document.getElementById('pos').textContent = d.part_of_speech;
